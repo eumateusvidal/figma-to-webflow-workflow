@@ -4,7 +4,25 @@
 
 The loop: **publish to staging → measure the real page → diff against Figma's numbers → fix root causes → re-measure → check the rest of the site.** Every fix is re-verified; nothing is assumed to have shipped.
 
-**Measure, don't eyeball.** Both sides are numeric: Figma geometry from `get_metadata`; page geometry from the driven browser at explicit viewport sizes (`getBoundingClientRect`, computed styles). The single best health check: `documentElement.scrollWidth === clientWidth` (any difference = horizontal overflow). A useful finding looks like *"video renders at 0.70 aspect; design intends 1.27"* — diagnosable, fixable, re-checkable.
+**Measure, don't eyeball.** Both sides are numeric: Figma geometry from `get_metadata`; page geometry from the driven browser at explicit viewport sizes (`getBoundingClientRect`, computed styles). A useful finding looks like *"video renders at 0.70 aspect; design intends 1.27"* — diagnosable, fixable, re-checkable.
+
+> ### ⚠ `scrollWidth === clientWidth` is a smoke test, NOT a responsive audit
+> An earlier revision of this document called it "the single best health check." **That was wrong, and this project proved it three separate times.** A page can pass it perfectly while being structurally shredded, because **a CSS Grid that stays fully active at 390px divides the *available* width** — its children get absurdly narrow and nothing ever crosses the viewport edge.
+>
+> | Page | Reported | Actually rendering at 390px |
+> |---|---|---|
+> | Listing page | ✅ 390/390 | Grid never collapsed: cards **69–100px** wide, hero image **225×106** |
+> | Team page | ✅ (after an overflow fix) | Portraits at **77×77px** inside a still-active 12-column grid |
+> | Contact page | ✅ 390/390 | Hero `h1` **214px wide and still right-aligned**; three wrappers at **61px** |
+>
+> **Audit element geometry instead:** `getBoundingClientRect` on the real content blocks — cards, images, headings, text wrappers — and check they occupy the width you intended. Then, separately, assert that *no element* overflows:
+> ```js
+> [...document.querySelectorAll('body *')]
+>   .filter(n => { const r = n.getBoundingClientRect(); return r.right > innerWidth + 1 || r.left < -1; })
+> ```
+> An empty result is meaningful; a matching `scrollWidth` on its own is not. (Filter out elements inside an `overflow:hidden` ancestor — intentional marquees and sliders will show up otherwise.)
+>
+> **Test the tablet band too, not just phone widths.** Two real overflows on this project lived at **768px** and were invisible at 390. Sweep 991 / 768 / 600 / 480 / 390 / 360.
 
 **Verify writes from the compiled CSS.** After publishing, download the page's stylesheet and confirm the rules actually shipped — the MCP can report success on writes that were clobbered (see the batch-race rule in [03](03-implementation-workflow.md)). Note: Webflow's optimizer legally re-collapses longhands into shorthands in the compiled output; judge writes by reading the style back through the API, not by the compiled file's shape.
 

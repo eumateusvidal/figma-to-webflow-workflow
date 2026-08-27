@@ -58,3 +58,19 @@ After: test the relevant breakpoints, verify no regressions, summarize.
 3. **Media is fluid:** `width: 100%` (not just `max-width` — small source assets will otherwise render small and collapse the composition), height auto or a project-standard `aspect-ratio` (3/4, 4/3, 3/2, 16/9 — not bespoke ratios from frame pixels), wrapper crops (`overflow:hidden`) + media fills (`object-fit:cover`). **Check the ancestor chain**: a shrink-to-fit link wrapper or flex parent collapses the box before the media ever sees it — fix the wrapper, not the image.
 
 Reordering for the mobile composition uses CSS `order` on modifier combos — DOM moves inside animated components are a last resort (they risk the interaction code).
+
+> ### ⚠ A page that already has *some* breakpoint rules is the most dangerous case
+> Inheriting a partial responsive layer is worse than inheriting none, because it looks finished. Before adding to one, extract **every** existing breakpoint rule for the page's classes and sort them into four kinds:
+>
+> | Kind | What it looks like | Handling |
+> |---|---|---|
+> | **Dead** | A class rule that is present in the compiled CSS and still does nothing | Remove it, then fix the real cause |
+> | **Wrong breakpoint** | Right value, sitting on the phone breakpoint, leaving the tablet band on the desktop layout | Re-write it on the tablet breakpoint. An identical phone-level twin is harmless |
+> | **Conflicting** | A phone-level value that overrides the tablet-level one you just wrote | **Must** be removed — this is the one that silently defeats a correct fix |
+> | **Missing** | Wrappers never given any rule at all | The actual work |
+>
+> **The "dead" kind has one dominant cause: a class rule outranked by an element-level `#w-node` ID rule.** ID specificity (1,0,0) beats a class (0,1,0), and **a media query adds no specificity** — so a breakpoint override on a Designer-placed grid child never applies, no matter how it reads. Worked case: `grid-column: 1/13` at the phone breakpoint on an element pinned by `#w-node-…{grid-area:1/6/2/13}` — in the store, in the compiled CSS, and completely inert. The fix is the container flex-collapse above, not a stronger selector; there isn't one.
+>
+> **The "conflicting" kind is invisible to the API.** Reading the style back confirms your tablet rule is correctly stored — and it still won't render below the phone breakpoint. After writing, list the *other* breakpoints on the same style and check for property collisions.
+>
+> One more: **a soured/locked breakpoint slot is per-breakpoint, not per-style.** If writes to one breakpoint on a style fail permanently, probe another before engineering a workaround — the rule you need may write cleanly where it belongs anyway.
