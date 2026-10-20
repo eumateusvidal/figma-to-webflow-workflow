@@ -6,7 +6,7 @@ A skill = a folder with a `SKILL.md` (YAML `name` + `description` frontmatter, t
 
 | Skill | Role | Contents |
 |---|---|---|
-| **`client-first-editorial`** | *How to build* | Naming, section structure, the 12-col grid system, typography layering, spacing methods, responsive rules, ~30 validated build patterns; references: the full **MCP playbook** (every verified tool trap + recovery) and the **class inventory** |
+| **`client-first-editorial`** | *How to build* | Naming, section structure, the 12-col grid system, typography layering, spacing methods, responsive rules, ~30 validated build patterns; references: the full **MCP playbook** (every verified tool trap + recovery), the **class inventory**, the **animation knowledge base**, and **`designer-parity.md`** (Designer-safe authoring rules, capability detection and evidence levels — generalized lessons from later builds, portable as-is) |
 | **`timestate-variables`** | *What values* | Three-layer token architecture, color-scheme (light/dark section) modes, all scales, decision trees, and the **ID registry** (every page/class/token/component/CMS-field ID, pre-harvested) |
 
 Always loaded together. The interaction with the rest of the system: **skills define conventions → handoff defines current state → architecture record defines the why → the live site is final truth.**
@@ -20,6 +20,7 @@ The skill was adapted to one specific working context: implementing the **Timest
 | Client-First foundation (Finsweet) | class naming discipline, utility philosophy, semantic structure, accessibility | Yes |
 | Timestate architecture | **full-width 12-col grid instead of Client-First's centered containers** (a deliberate contradiction), variable-mode section theming, the specific token scale, the editorial-row patterns | No — template design decisions |
 | Project specifics | ID registry, class inventory, documented tool traps *as encountered here*, page patterns | No — but the *categories* are exactly what your adaptation should populate |
+| Generalized engineering lessons | `references/designer-parity.md`: explicit grid templates, native resting states, capability detection, evidence levels | **Yes** — validated on later, unrelated builds; keep it when you adapt the skill |
 
 Adapting a skill to the real project beats applying generic rules because a build session doesn't need general answers — it needs *this project's* answers: one correct way per decision, no plausible-but-wrong defaults, and every documented trap is an hour the next session doesn't lose.
 
