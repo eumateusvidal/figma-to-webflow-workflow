@@ -40,7 +40,33 @@ The loop: **publish to staging → measure the real page → diff against Figma'
 
 Also: pass explicit width/height to the browser resize (presets can silently no-op) and assert `clientWidth` ≠ 0 before trusting anything.
 
+**Report the evidence level of every claim.** From weakest to strongest:
+
+| Level | Evidence | What it proves |
+|---|---|---|
+| 1 | Tool echo (`success`) | The request was accepted |
+| 2 | API read-back | Something was stored. Lossy: some values are omitted or normalised (`0` → `0px`) even though they compile |
+| 3 | **Local simulation**: a local build, or the live page with stored rules injected | A useful gate before staging. **It is not Webflow output** |
+| 4 | Published compiled HTML/CSS on staging | What Webflow generated |
+| 5 | Measured rendering of the published page at explicit widths | What users get |
+| 6 | Designer canvas after a reload, or its emulation (labelled as such) | That the next editor sees the same thing ([06](06-designer-parity-and-troubleshooting.md)) |
+| 7 | Real devices and assistive technology | The rest |
+
+A simulation can miss what Webflow adds on publish. For example, `w-variant-…` classes appear only on elements whose styles carry component-variant data, and some sites strip script-only classes from per-page CSS. So the status line reads "simulated locally; staging pending", never "verified".
+
 **Regression scope:** overflow-check every page of the site at mobile width; re-measure desktop on the changed page against known-good positions; call out any intentionally site-wide change explicitly. End every session by telling the human exactly what needs real eyes (typically: animations, and a scroll on an actual phone).
+
+## Publishing safely
+
+On many plans a publish is **site-wide**. It ships every staged change by anyone, and a non-draft page goes live at anyone's next publish. On a shared company site, other people's publishes took unpublished work live several times without notice. Treat every publish as its own decision:
+
+1. **Fresh preflight.** List the pages and CMS items changed since the last publish, and by whom. If anyone else has changes pending, stop and report.
+2. **Staging first.** Publish to the Webflow subdomain only. Then diff every route's HTML (visible text and structure) and the full CSS rule set against production, and classify each difference. Only the intended, namespaced changes may differ. If something unexplained appears after a staging publish, republish staging and diff again.
+3. **Get explicit approval for this publish.** A standing approval may cover staging; a production approval covers that one publish only.
+4. **After publishing:** confirm production matches the staging build you diffed, re-run the page checks, and confirm the intended indexing state (noindex, sitemap, canonical).
+5. **Keep rollback structural.** Hide replaced blocks rather than deleting them. Keep before/after copies of every embed in the repo. Keep before-captures and style snapshots, and record the rollback path before you publish.
+
+Never publish a client's production site just to test a hypothesis. Use a sandbox site.
 
 ## Step 11 — Capture learnings into the skills
 
@@ -57,6 +83,19 @@ Before the session closes, route every finding to its one home:
 | Token/ID harvested | The variables skill's registry |
 | Broken/deferred/needs-decision | The debt register (numbered, with status) |
 | Project state + next action | The handoff — **rewritten**, facts re-verified live, never copied forward |
+
+**Classify each finding before filing it.** The class decides both where a finding goes and how long it stays true:
+
+| Class | Example | Shelf life |
+|---|---|---|
+| Universal principle | "The published page is the proof; read-backs are lossy" | Long |
+| Webflow platform constraint | "The canvas draws a template-less grid as two columns" | Until Webflow changes it. Record the evidence |
+| Tool-specific behaviour | "The HTML builder turns `<button>` into a link" (MCP 2.1, 2026-10) | **Date and version it.** Re-probe on upgrades |
+| Conditional practice | "Namespace everything when building inside a host site" | State the condition |
+| Project decision | "This site's phone layout starts at 767" | Handoff or decision log, never the skill |
+| Unverified hypothesis | "Embed CSS doesn't apply on the canvas" (two builds disagreed) | Open-questions list until tested |
+
+Prefer principles to numbers ("small sequential batches; verify per container" outlives "batches of 12"). When a rule can be checked by a script, such as a CSS lint or a scan of the published output, add the check: scripts can't be skimmed past.
 
 **The filter — what becomes a rule:**
 - *Generalizable?* Will bite future sessions → skill. Page-specific → stays in the page.

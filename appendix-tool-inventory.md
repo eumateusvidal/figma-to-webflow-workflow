@@ -24,6 +24,18 @@ Listed so nobody wastes time hunting for them as "the secret ingredient" — the
 | **Generic `client-first-webflow` skill** | Deliberately **superseded** by the project-adapted skill (see [05-skills-and-adaptation.md](05-skills-and-adaptation.md)) — every project document instructs not to follow it |
 | **"Figma Bridge"** | No resource by this name exists in this setup. If you've heard the term, the thing actually used is the **Figma desktop app's Dev Mode MCP server** (row 2 above) |
 
+## Tool surface drift — what changed after the original build (dated)
+
+The inventory above describes the original template build (2026-07 → 09). Later builds on MCP 2.1.0 → 2.2.0 (2026-09 → 10) showed how quickly the surface moves. These are examples of why [01](01-prerequisites.md#webflow-mcp--detect-capabilities-dont-assume-them) asks for a capability check every session, not a list to trust:
+
+| Observation | Then | Later |
+|---|---|---|
+| Element query / move / delete, page creation, tag change | Believed absent (2026-07) | Present in 2.0.1 (2026-08) |
+| Reading component-variant styles by name | Not returned by style reads (2.0.1, 2026-08) | The 2.2.0 guide documents a variant-styles read action (2026-10) |
+| Variables holding `calc()` / `clamp()` (`custom_value`) | Failed with an internal error (2.1.0, 2026-09) | Documented with a `calc()` example in the 2.2.0 guide; re-probe before relying on it |
+| Interactions (IX3) | Not used through the MCP on the original build | An interactions tool exists in 2.2.0. Its guide warns that a stored interaction is not proof it animates: confirm in Preview or published |
+| Connector "connected" | Assumed usable | Seen authorised on the account but not loaded in an IDE session. Check what is loaded |
+
 ## The practical takeaway
 
 The implementation quality came from **two MCP connections + two adapted skills + a measurement discipline** — not from a large stack of integrations. If you are reproducing this workflow, the complete shopping list is in [01-prerequisites.md](01-prerequisites.md), and the only downloadable artifacts are the two skills in [skills-export/](skills-export/). Everything else is either an integration you connect (Webflow MCP, Figma desktop MCP) or already built into Claude Code.
