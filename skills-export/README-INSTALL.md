@@ -23,6 +23,8 @@ client-first-editorial/
   references/
     mcp-workflow.md
     utility-classes.md
+    animation-system.md
+    designer-parity.md          ← portable: Designer-safe rules, capability detection
 
 timestate-variables/
   SKILL.md
