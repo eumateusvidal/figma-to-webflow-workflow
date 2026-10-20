@@ -31,9 +31,11 @@ What this project is, one paragraph: purpose (client site / template / product),
 
 ## 3. MCP / Tooling Readiness — probed at close, not assumed
 
-| Channel / tool | Probe run (and when) | Result |
-|---|---|---|
-| | | |
+| Capability (layer → tool/action) | Probe run (when, MCP version) | Result: proven / failed / untested | Evidence |
+|---|---|---|---|
+| | | | |
+
+- Tools **loaded in this session** vs merely connected on the account — note any connector that was authorised but not available.
 
 - What needs **no setup** next session (and how you know), vs. what must be re-verified.
 - **The exact first call the next session should make** to confirm readiness, with the IDs it needs inline.
@@ -44,6 +46,8 @@ What this project is, one paragraph: purpose (client site / template / product),
 - Last publish: timestamp, and **how you proved nothing is pending** (e.g. per-page lastUpdated vs lastPublished — never a site-level timestamp).
 - Per-page table: state, known issues (referencing debt-register IDs).
 - Any verification sweep results worth keeping (e.g. overflow audit per page at mobile width).
+- **Publish scope and who else publishes this site** (single-page vs site-wide; other editors) — and the preflight to run before the next publish ([templates/PRE-PUBLISH-CHECKLIST-template.md](PRE-PUBLISH-CHECKLIST-template.md)).
+- **Designer parity status** per page: canvas checked after reload / emulated / not checked ([06](../06-designer-parity-and-troubleshooting.md)).
 
 ## 5. Work Completed This Session
 
