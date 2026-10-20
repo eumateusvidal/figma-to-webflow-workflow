@@ -127,3 +127,32 @@ Any remaining pending items or dependencies.
 Whether the Webflow MCP context was successfully verified and is ready for immediate use, or exactly what must be done to restore or confirm it in the next session.
 Do not begin new implementation work after this preparation is complete. The purpose of this step is to close the current context cleanly and leave the project in a reliable state for the next session.
 ```
+
+## 4 — Designer Parity Audit
+
+Use when a page looks right published but wrong in the Designer, or before handing a build to a client's team. Background: [06-designer-parity-and-troubleshooting.md](06-designer-parity-and-troubleshooting.md).
+
+```text
+Audit page "X" for Webflow Designer parity. Do not change anything yet.
+Before starting: run the Webflow capability check and tell me which layers are available in this session (data, element/style, Designer).
+Then:
+Compare three states side by side for every section: the Figma reference, the Designer canvas (after a reload, if the Designer is open), and the published page. If the Designer is not reachable, emulate it (published page with JavaScript disabled and embed styles removed) and label those results as emulated.
+Scan the compiled CSS of the published page for grids without grid-template-columns and for repeat(auto-fill/auto-fit); list every class and breakpoint affected.
+List every component whose resting state depends on a script or embed CSS (stacked panels, empty stages, hidden content).
+For each finding give: symptom, root cause, proposed fix, and the blast radius of the class or component involved.
+Then stop and wait for my approval before writing anything.
+```
+
+## 5 — Pre-Publish Preflight
+
+Use before every publish, including small ones. Background: [04 · Publishing safely](04-validation-and-learning.md#publishing-safely).
+
+```text
+Prepare a publish of page "X". Do not publish to production.
+1. List every page and CMS item changed since the last publish, with who changed it and when. If anything outside the intended change is pending, stop and report it.
+2. Publish to the staging subdomain only.
+3. Diff every route's HTML (visible text and structure) and the full CSS rule set between staging and production. Classify each difference as intended or unexpected.
+4. Re-run the page checks on staging: widths from 1440 down to 360, no horizontal overflow, keyboard path, accessibility scan, form submissions intercepted (no real submissions).
+5. Report: the diff summary, the check results with their evidence level, the rollback path, and any Designer-only steps still pending.
+Then wait for my explicit OK for this production publish.
+```
