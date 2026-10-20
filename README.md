@@ -15,7 +15,7 @@ PREPARE (once per project)
  1. Prepare the design system and handoff in Figma          → 02
  2. Prepare the Webflow project: variables, naming, base classes → 02
  3. Install the skills; write your project-context docs      → 01, 04
- 4. Connect and validate the Figma + Webflow MCPs            → 01
+ 4. Connect the MCPs; run the capability check (every session) → 01
 
 IMPLEMENT (every page)
  5. Analyze the existing project before touching anything    → 03
@@ -23,9 +23,11 @@ IMPLEMENT (every page)
  7. Map the design onto existing project patterns            → 03
  8. Build with validated patterns; ask on real decisions     → 03
  9. Test responsiveness and functionality                    → 03
+    Keep it Designer-safe: explicit grids, native resting states → 06
 
 CLOSE (every session)
-10. Visual validation against Figma; fix root causes         → 04
+10. Visual validation against Figma; Designer parity; fix root causes → 04, 06
+    Publish only after a fresh preflight + staging diff + explicit OK → 04
 11. Capture reusable learnings into the skills               → 04
 ```
 
@@ -38,9 +40,10 @@ CLOSE (every session)
 | [03-implementation-workflow.md](03-implementation-workflow.md) | Steps 5–9: analysis, Figma inspection, build rules, responsive system |
 | [04-validation-and-learning.md](04-validation-and-learning.md) | Steps 10–11: measurement-based validation, skill capture |
 | [05-skills-and-adaptation.md](05-skills-and-adaptation.md) | **The skills, and how to adapt `client-first-editorial` to your project** — the most detailed section |
+| [06-designer-parity-and-troubleshooting.md](06-designer-parity-and-troubleshooting.md) | When the Designer, Preview and published page disagree: authoring rules, detection, decision tree, recovery playbooks |
 | [appendix-tool-inventory.md](appendix-tool-inventory.md) | Exactly what was used and what wasn't |
-| [prompts.md](prompts.md) | The reusable prompt library (desktop page, mobile page, session close) |
-| [templates/](templates/) | Ready-to-use project-handoff template |
+| [prompts.md](prompts.md) | The reusable prompt library (desktop page, mobile page, session close, Designer-parity audit, pre-publish preflight) |
+| [templates/](templates/) | Project-handoff and pre-publish checklist templates |
 | [skills-export/](skills-export/) | Downloadable skills + install guide |
 
 ## Attribution: Client-First by Finsweet
@@ -48,6 +51,10 @@ CLOSE (every session)
 The naming and structure methodology underlying this workflow's main skill is **[Client-First](https://finsweet.com/client-first), a methodology created by Finsweet**. Full credit for Client-First belongs to Finsweet; their official documentation is the authoritative source for the methodology itself.
 
 The **`client-first-editorial`** skill in this repository is an **independent adaptation** of that methodology, created for one specific working context (implementing a Webflow template with Claude). It deliberately diverges from standard Client-First in documented places — most notably a full-width 12-column grid instead of centered containers. It is **not an official Finsweet product, skill, or endorsement**, and should never be presented as one. The layer-by-layer breakdown of what is Finsweet's methodology, what is project adaptation, and how to build your own adaptation is in [05-skills-and-adaptation.md](05-skills-and-adaptation.md).
+
+## Related workflow
+
+This playbook starts from an approved **Figma design**. A companion **Code → Webflow** workflow, kept in a separate private repository for now, covers the case where the starting point is an existing coded site or app (React, Next.js, Vue, Astro, Tailwind, plain HTML and so on). It shares the Webflow-side discipline described here: capability detection, Designer parity, evidence levels and publish safety. Each workflow is usable on its own.
 
 ## The one principle everything else follows from
 

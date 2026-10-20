@@ -9,6 +9,16 @@ Never build into a project you haven't read. Concretely:
 - **Before any responsive work: determine the page's grid-placement mechanism.** Grep the page's compiled CSS for `#w-node`. Many hits → children are element-placed (Designer-only; class overrides *cannot* beat those ID rules — the workaround is flipping the container to flex at the breakpoint, which makes child `grid-area` inert). Few/none → class-placed, freely re-flowable headlessly.
 - Check the blast radius of every class you plan to touch: is it page-scoped or used site-wide? One `curl`-and-grep per class across the site's pages answers it.
 
+> ### Building inside a site you don't own the system of
+> A landing page added to an existing company site is a different job from building your own template: the host's system is not yours to change, and other people publish the same site. Before the first write, run a **read-only preflight** and record it in the handoff:
+>
+> - **Names already taken.** Export every existing style name to a do-not-reuse list. Generic Client-First names (`padding-global`, `button`, `is-hide`) usually exist already, so **namespace everything you create with a prefix** — classes, combos (`xx-is-active`, never a bare `is-active`), variable collections, components, data attributes, asset names and font family names.
+> - **Tag styles leak in.** Host `h1`–`h6`, `p`, `a`, list and `body` styles reach your page (on one build: a 10vw serif `h1` with negative tracking, orange uppercase `h2`s, white 22px paragraphs). Every text role you create sets family, size, weight, line-height, letter-spacing, transform, colour and margins explicitly. Never rely on inherited text styling, and never leave semantic tags unclassed.
+> - **Leaks out.** Builder CSS with tag or descendant selectors can create global tag styles, so send only flat single-class CSS. Never add font faces to a host family (it silently changes host text); upload under a distinct family name. Keep code page-level, never site-level.
+> - **Shared resources stay untouched.** Host components, variables, tag styles, global code and site settings. If Webflow forces a change to one, stop and ask.
+> - **Baseline the host.** Capture representative host pages (screenshots and computed-style fingerprints) before writing, and diff after each stage. Known false positives are lazy-loaded images and cookie banners.
+> - **Know the publish scope** before planning: see [04 · Publishing safely](04-validation-and-learning.md#publishing-safely).
+
 ## Step 6 — Analyze the Figma design
 
 1. `get_metadata` on the frame → full node tree with exact x/y/w/h. Work from these numbers.
@@ -47,7 +57,17 @@ After: test the relevant breakpoints, verify no regressions, summarize.
 - CSS longhand only — no `padding`/`margin`/`gap`/`grid-column` shorthands (`gap` specifically corrupts into a custom property; use `grid-column-gap`/`grid-row-gap`, flex included)
 - One style per write call — two writes to the same class in one batch race and silently clobber each other; read the `breakpoints` map in every echo, not just `success`
 - `set_style` replaces the element's full class list, resolves names globally, and can attach a foreign combo chain — always read the `styleNames` echo back
-- Never send long comma-bearing values (gradients, data-URIs) through style writes — they truncate and can permanently corrupt that class's breakpoint store
+- Never send long comma-bearing values (gradients, data-URIs) through style writes — they truncate and can permanently corrupt that class's breakpoint store. Two quieter cases from later builds: a `calc(… * n)` inside a gradient was stored truncated, and compound values that mix `var()` with other tokens collapsed to the bare variable. Precompute them, or split them into longhands.
+- **Writes are sequential.** Parallel writes failed with 410/socket errors, and two publishes within about a minute returned 429.
+- **A timeout is not a failure.** Several timed-out batches had applied in full, and blind retries created duplicate classes and instances. Query what the batch touched before resending anything.
+- **A failed action doesn't stop the batch.** After an "already exists" error, later updates in the same batch still ran, and on a shared site they modified someone else's class. Only touch names you own, and check existence first.
+- **Builders drop classes that don't exist yet.** Create every class *and every combo chain* (`a.b`, `a.b.c`) before the markup that uses it. The element builder doesn't create chains on the fly.
+- **The HTML builder alters some markup** (2026, verify on your version): `<button>` becomes a link; `hidden`, empty boolean attributes and `target` are dropped; leading and trailing spaces in inline text are trimmed; and an inline element containing only inline elements was stored, and published, as a literal `##INLINE<n>##` string. Grep the published HTML after every markup push.
+
+**Designer-safe by construction** (why: [06](06-designer-parity-and-troubleshooting.md)):
+- Every `display: grid` declares `grid-template-columns` at the breakpoint where it becomes a grid. Use no `auto-fill`/`auto-fit`, and give explicit counts per breakpoint instead.
+- Every component's resting state, with no scripts and no embed CSS, is the finished composition.
+- Script-set states are attributes or ARIA, styled in the component's own embed. They are never classes that exist only at runtime.
 
 ## Step 9 — Responsive implementation
 
